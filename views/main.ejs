@@ -5,11 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 </head>
 <body>
-    <link rel="stylesheet" href="../index.css">
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-
     <div>
         <h1><strong><%= id %></strong> 님</h1>
         <button class="logout"><a href="/logout">Logout</a></button>
@@ -159,8 +157,9 @@
           method: 'PUT',
           url: '/main/put/true',
           data: {_id: num, query: deadline}
-        }).done(function() {
+        }).done(function(result) {
           alert('해당 Todo를 완료 처리했습니다!');
+          location.reload();
         }).fail(function(a,b,c) {
           console.log(a,b,c);
         })
@@ -172,8 +171,10 @@
           method: 'PUT',
           url: '/main/put/false',
           data: {_id: num, query: deadline}
-        }).done(function() {
+        }).done(function(result) {
+          console.log('false');
           alert('해당 Todo를 미완료 처리했습니다!');
+          location.reload();
         }).fail(function(a,b,c) {
           console.log(a,b,c);
         })
@@ -181,13 +182,15 @@
 
       $('.delete').click((e) => {
         var num = e.target.dataset.id;
+        var clickThis = $(this);
         $.ajax({
           method: 'DELETE',
           url: '/main/delete',
           data: {_id: num, query: deadline}
-        }).done(function() {
+        }).done(function(result) {
           clickThis.parent('div').fadeOut();
           alert('해당 Todo를 삭제하였습니다');
+          location.reload();
         }).fail(function(a,b,c) {
           console.log(a,b,c);
         })

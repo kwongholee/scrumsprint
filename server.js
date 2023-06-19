@@ -14,6 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(methodoverride('_method'));
+app.use(express.static('public'));
 
 app.set('view engine', 'ejs')
 
@@ -123,6 +124,12 @@ passport.deserializeUser(function(id, done) {
   })
 })
 
+function isKoreanName(v) {
+  let regex = /^[가-힣]{1,10}$/;
+
+  return regex.test(v);
+}
+
 function isID(v) { //4자 이상 20자 이하 영문 아이디 정규식
   let regex = /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{4,20}$/;
 
@@ -155,7 +162,10 @@ app.post('/register', function(req, res) {
           return res.send("<script>alert('이미 사용중인 아이디입니다! 다른 아이디를 사용해주세요!'); window.location.replace('/register'); </script>");
         }
       })
-      if(!isID(req.body.id)) {
+      if(!isKoreanName(req.body.name)) {
+        return res.send("<script>alert('한글로 이름을 작성해주세요!'); window.location.replace('/register'); </script>")
+      }
+      else if(!isID(req.body.id)) {
         return res.send("<script>alert('4자 이상 20자 이하의 영문 아이디 형식을 지켜주세요!'); window.location.replace('/register'); </script>");
       }
       else if(!isPhoneNum(req.body.phonenumber)) {
@@ -189,6 +199,10 @@ app.get('/main', Logined, (req,res) => { // 로그인하면 이 페이지로 넘
     if (postresultFalse.length != 0 || postresultTrue.length != 0) percent = postresultTrue.length / (postresultTrue.length+postresultFalse.length) * 100;
     res.render('main.ejs', {id: req.user.id, postsfalse: postresultFalse, poststrue: postresultTrue, percent: percent});
   })
+})
+
+app.get('/main/group', (req, res) => {
+  res.render('groupmake.ejs');
 })
 
 app.get('/logout', Logined,  function (req, res, next)  {
@@ -239,7 +253,8 @@ app.delete('/main/delete', Logined, function(req, res) {
 })
 
 // 아이디 중복확인 버튼을 만드는 거 어떰? (잠깐 대기 맨 마지막에 구현해도 될 듯?)
-// 메인 홈페이지 디자인 꾸미자
-// 로그인 페이지랑 회원가입 페이지 분리하자
+// 로그인 페이지랑 회원가입 페이지 꾸미기
 // 그룹 만들기 페이지 생성(그룹장, 그룹원, 초대 코드) (/main/?group=~)
 // 그룹에서 만든 스프린트는 작성자를 그룹으로 만들기
+// 00시 지나면 '오늘 할 일 '로 지정된 todo 지우기 ('node-cron')
+// 날짜도 기록해서 날짜별로 todo 뭐 있었는지 볼 수 있게 하기

@@ -5,30 +5,36 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <style>
-        body {
-          background-image: url(public/scrumsprint_background.jpg);
-          background-size: cover;
-        }
-    </style>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
 </head>
 <body style="margin: 0px;">
     <div class="main-background">
-        <h1 class="main-title">Welcome to Kwongho's Sprint</h1>
+        <h1 id="myElement" class="main-title fade-in">Welcome to Kwongho's Sprint</h1>
         <br>
-        <button class="main-button"><a href="/login">login</a></button>
+        <button id="myElement2" class="main-button fade-in"><a href="/login">login</a></button>
     </div>
 
     <style>
-        .main-background {
-            width: 100%;
-            height: 500px;
-            background-image: url(./public/scrumsprint_background.jpg);
+        body{
+            background-image: url("scrumsprint_background.jpg");
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
+        }
+
+        .fade-in {
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+        
+        .fade-in.show {
+            opacity: 1;
+        }
+
+        .main-background {
+            width: 100%;
+            height: 600px;
             padding: 1px;
+            margin-top: 15%;
         }
           
         .main-title {
@@ -64,8 +70,26 @@
     </style>
 
     <div class="main-div">
-        <p style="text-align: center;"><small>made by <i>kwongholee</i></small></p>
+        <p id="myElement3" class="fade-in" style="text-align: center;"><small>made by <i>kwongholee</i></small></p>
     </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            var element1 = document.getElementById('myElement');
+            var element2 = document.getElementById('myElement3');
+            var element3 = document.getElementById('myElement2');
+
+            setTimeout(function() {
+                element1.classList.add('show');
+            }, 1000);
+            setTimeout(function() {
+                element2.classList.add('show');
+            }, 2000);
+            setTimeout(function() {
+                element3.classList.add('show');
+            }, 3000);
+        });
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>

@@ -202,7 +202,7 @@ app.post('/write', Logined, function(req, res) {
     var posts = result.totalPost;
     db.collection('post').insertOne({_id: posts+1, writer: req.user.id, content: req.body.content, deadline: req.query.time, complete: 'false'}, (err, result) => {
      db.collection('counter').updateOne({name: 'postNum'}, {$inc: {totalPost: 1}}, (err, result) => {
-      res.redirect(`/main/?time=${req.query.time}`);
+      res.status(200).send({message: 'success to post'});
      })
     })
   })
@@ -212,7 +212,7 @@ app.put('/main/put/true', Logined, function(req,res) {
   db.collection('post').updateOne({_id: parseInt(req.body._id)}, {$set: {complete: 'true'}}, (err, result) => {
     if(err) console.log(err);
     else console.log('success to complete change to true');  
-    res.redirect(`/main/${req.body.query}`);
+    res.status(200).send({message: 'success to complete change to true'});
   })
 })
 
@@ -220,7 +220,7 @@ app.put('/main/put/false', Logined, function(req,res) {
   db.collection('post').updateOne({_id: parseInt(req.body._id)}, {$set: {complete: 'false'}}, (err, result) => {
     if(err) console.log(err);
     else console.log('success to complete change to false');  
-    res.redirect(`/main/${req.body.query}`);
+    res.status(200).send({message: 'success to complete change to false'});
   })
 })
 
@@ -228,6 +228,6 @@ app.delete('/main/delete', Logined, function(req, res) {
   db.collection('post').deleteOne({_id: parseInt(req.body._id)}, (err, result) => {
     if(err) console.log(err);
     else console.log('success to delete');
-    res.redirect(`/main/${req.body.query}`);
+    res.status(200).send({message: 'success to delete'});
   })  
 })

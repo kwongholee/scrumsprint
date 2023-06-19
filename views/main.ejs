@@ -5,18 +5,69 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
     <div>
-        <h1><strong><%= id %></strong> 님</h1>
-        <button class="logout"><a href="/logout">Logout</a></button>
+        <h1 style="display: inline-block;"><i><%= id %></i> 님의 Sprint(달려라 달려)</h1>
+        <button class="logout-button"><a href="/logout" style="color: #fff; text-decoration: none;">Logout</a></button>
     </div>    
 
+    <style>
+      .logout-button {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        background-color: #ff4d4d;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+    
+      .logout-button:hover {
+        background-color: #ff6666;
+      }
+    </style>
+
     <div>
-      <button id="today">오늘 할 일</button>
-      <button id="project">이번 프로젝트에서 할 일</button>
+      <button class="todayBtn" id="today">오늘 할 일</button>
+      <button class="projectBtn" id="project">이번 프로젝트에서 할 일</button>
     </div>
+
+    <style>
+      .todayBtn {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        background-color: #ff94c2;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      .todayBtn:hover {
+        background-color: #ff7db2;
+      }
+
+      .projectBtn {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        background-color: #a86eeb;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      .projectBtn:hover {
+        background-color: #925cd9;
+      }
+    </style>
 
     <script>
       $('#today').click(() => {
@@ -29,30 +80,71 @@
     </script>
 
     <div>
-      <input id="content" type="text" placeholder="할 일">
-      <button id="submitTodo" type="submit">제출</button>
+      <input class="input" id="content" type="text" placeholder="할 일" size="50">
+      <button class="submitTodo" id="submitTodo" type="submit">스프린트 등록</button>
     </div>
+
+    <style>
+      .input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+        width: 200px;
+        outline: none;
+      }
+
+      .input:focus {
+        border-color: #4c9aff;
+        box-shadow: 0 0 5px #4c9aff;
+      }
+
+      .submitTodo {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        background-color: #ffcc33;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .submitTodo:hover {
+        background-color: #ffdd66;
+      }
+    </style>
 
     <script>
       var deadline = window.location.search;
+      var time = "오늘 할 일";
+      if(deadline.substr(6) == "project") time = "이번 프로젝트에서 할 일";
       
       $('#submitTodo').click(() => {
         var content = $('#content').val();
-        $.ajax({
-          type: 'POST',
-          url: `/write/${deadline}`,
-          data: {content: content}
-        }).done(function() {
-          console.log('success to post todo')
-        }).fail(function(a,b,c) {
-          console.log(a,b,c);
-        })
+        if(content != "") {
+          $.ajax({
+            type: 'POST',
+            url: `/write/${deadline}`,
+            data: {content: content}
+          }).done(function() {
+            alert(`해당 Todo를 "${time}"에 추가하였습니다!`);
+            location.reload();
+          }).fail(function(a,b,c) {
+            console.log(a,b,c);
+          })
+        }
+        else {
+          alert("Todo 입력란에 아무것도 입력 안 하셨어요");
+          location.reload();
+        }
       })
     </script>
 
     <style>
       .sprint-container {
-        width: 300px;
+        width: 50%;
         height: 30px;
         background-color: #f1f1f1;
         border-radius: 15px;
@@ -62,19 +154,67 @@
       .sprint-progress {
         height: 100%;
         background-color: #4caf50;
-        transition: width 0.3s ease-in-out;
+        transition: width 1s ease-in-out;
+      }
+
+      .sprint-progress-bar {
+        height: 100%;
+        transition: width 1s ease-in-out;
+      }
+
+      .sprint-icon {
+        font-size: 36px;
+        color: black;
+        position: relative;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
       }
     </style>
 
-    <div class="sprint-container">
-      <div class="sprint-progress" id="progress-bar" data-percent="<%= percent %>"></div>
+    <div>
+      <div style="display: inline;">
+        <h3><%= percent %>%</h3>
+      </div>
+
+      <div  class="sprint-container">
+        <div class="sprint-progress" id="progress-bar1" data-percent="<%= percent %>">
+          <div class="sprint-progress-bar" id="progress-bar2" data-percent="<%= percent %>">
+            <i class="fas fa-running sprint-icon"></i>
+          </div>
+        </div>
+      </div>
     </div>
     
     <script>
       window.onload = function() {
-        let progressBar = document.getElementById('progress-bar');
-        let percent = progressBar.getAttribute('data-percent');
-        progressBar.style.width = percent + '%';
+        let progressBar1 = document.getElementById('progress-bar1');
+        let percent1 = progressBar1.getAttribute('data-percent');
+        progressBar1.style.width = percent1 + '%';
+
+        let progressBar2 = document.getElementById('progress-bar2');
+        let percent2 = progressBar2.getAttribute('data-percent');
+        progressBar2.style.width = percent2 + '%';
+
+        let sprintIcon = document.querySelector('.sprint-icon');
+        let sprintProgressBar = document.querySelector('.sprint-progress-bar');
+        
+        let targetPercent = percent2;
+        let targetPosition = (targetPercent / 100) * progressBar2.offsetWidth;
+        let currentPosition = 0;
+        
+        let interval = setInterval(moveSprintIcon, 10);
+        
+        function moveSprintIcon() {
+          if (currentPosition >= targetPosition) {
+            clearInterval(interval);
+          } else {
+            let increment = (targetPosition - currentPosition) / 100; // 증분 계산
+            currentPosition += increment;
+            sprintIcon.style.left = currentPosition + 'px';
+            sprintProgressBar.style.width = (currentPosition / progressBar2.offsetWidth) * 100 + '%';
+          }
+        }
       };
     </script>
 

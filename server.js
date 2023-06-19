@@ -40,6 +40,10 @@ app.get('/login', (req,res) => { //로그인 페이지 get
   res.render('login.ejs');
 })
 
+app.get('/register', (req, res) => {
+  res.render('register.ejs');
+})
+
 app.post('/login',passport.authenticate('local', { //로그인 value가 타당하면 로그인, 에러나면 /fail로 redirect
   failureRedirect: '/fail'
 }) ,function(req, res) {
@@ -140,27 +144,29 @@ function isPW(v) { //6~15자 이상의 영문 대소문자 사용 + 최소 1개 
 app.post('/register', function(req, res) {
   var createdSalt;
   var createdPW;
+  var doublecheck = false;
   createHashedPassword(req.body.pw).then(function(result) {
     createdSalt = result.salt; 
     createdPW = result.hashedPassword;
     db.collection('user').find().toArray((err,result) => {
       result.map((a,i) => {
         if(a.id == req.body.id) {
-          res.send("<script>alert('이미 사용중인 아이디입니다! 다른 아이디를 사용해주세요!'); window.location.replace('/login'); </script>");
+          doublecheck = true;
+          return res.send("<script>alert('이미 사용중인 아이디입니다! 다른 아이디를 사용해주세요!'); window.location.replace('/register'); </script>");
         }
       })
       if(!isID(req.body.id)) {
-        res.send("<script>alert('4자 이상 20자 이하의 영문 아이디 형식을 지켜주세요!'); window.location.replace('/login'); </script>");
+        return res.send("<script>alert('4자 이상 20자 이하의 영문 아이디 형식을 지켜주세요!'); window.location.replace('/register'); </script>");
       }
       else if(!isPhoneNum(req.body.phonenumber)) {
-        res.send("<script>alert('전화번호를 입력해주세요!'); window.location.replace('/login'); </script>");
+        return res.send("<script>alert('전화번호를 입력해주세요!'); window.location.replace('/register'); </script>");
       }
       else if(!isPW(req.body.pw)) {
-        res.send("<script>alert('비밀번호는 6~15자의 영문 대소문자를 사용해야 하며, 최소 1개 이상의 숫자 혹은 특수 문자를 포함했는지 확인해주세요!'); window.location.replace('/login'); </script>");
+        return res.send("<script>alert('비밀번호는 6~15자의 영문 대소문자를 사용해야 하며, 최소 1개 이상의 숫자 혹은 특수 문자를 포함했는지 확인해주세요!'); window.location.replace('/register'); </script>");
       }
-      else {
+      else if(!doublecheck) {
         db.collection('user').insertOne({name: req.body.name, id : req.body.id, phonenumber: req.body.phonenumber, pw: createdPW, salt: createdSalt}, function(err, result) {
-          res.redirect('/main/?time=today');
+          return res.redirect('/main/?time=today');
         })
       }
     })
@@ -231,3 +237,9 @@ app.delete('/main/delete', Logined, function(req, res) {
     res.status(200).send({message: 'success to delete'});
   })  
 })
+
+// 아이디 중복확인 버튼을 만드는 거 어떰? (잠깐 대기 맨 마지막에 구현해도 될 듯?)
+// 메인 홈페이지 디자인 꾸미자
+// 로그인 페이지랑 회원가입 페이지 분리하자
+// 그룹 만들기 페이지 생성(그룹장, 그룹원, 초대 코드) (/main/?group=~)
+// 그룹에서 만든 스프린트는 작성자를 그룹으로 만들기

@@ -15,5 +15,17 @@
   "bugs": {
     "url": "https://github.com/kwongholee/scrumsprint/issues"
   },
-  "homepage": "https://github.com/kwongholee/scrumsprint#readme"
+  "homepage": "https://github.com/kwongholee/scrumsprint#readme",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "method-override": "^3.0.0",
+    "mongodb": "^3.6.4",
+    "nodemon": "^2.0.22",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
+    "rand-token": "^1.0.1"
+  }
 }

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <link rel="stylesheet" href="../index.css">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+    <div>
+        <h1><strong><%= id %></strong> 님</h1>
+        <button class="logout"><a href="/logout">Logout</a></button>
+    </div>    
+
+    <div>
+      <button id="today">오늘 할 일</button>
+      <button id="project">이번 프로젝트에서 할 일</button>
+    </div>
+
+    <script>
+      $('#today').click(() => {
+        window.location.replace('/main/?time=today');
+      })
+
+      $('#project').click(() => {
+        window.location.replace('/main/?time=project');
+      })
+    </script>
+
+    <div>
+      <input id="content" type="text" placeholder="할 일">
+      <button id="submitTodo" type="submit">제출</button>
+    </div>
+
+    <script>
+      var deadline = window.location.search;
+      
+      $('#submitTodo').click(() => {
+        var content = $('#content').val();
+        $.ajax({
+          type: 'POST',
+          url: `/write/${deadline}`,
+          data: {content: content}
+        }).done(function() {
+          console.log('success to post todo')
+        }).fail(function(a,b,c) {
+          console.log(a,b,c);
+        })
+      })
+    </script>
+
+    <style>
+      .sprint-container {
+        width: 300px;
+        height: 30px;
+        background-color: #f1f1f1;
+        border-radius: 15px;
+        overflow: hidden;
+      }
+      
+      .sprint-progress {
+        height: 100%;
+        background-color: #4caf50;
+        transition: width 0.3s ease-in-out;
+      }
+    </style>
+
+    <div class="sprint-container">
+      <div class="sprint-progress" id="progress-bar" data-percent="<%= percent %>"></div>
+    </div>
+    
+    <script>
+      window.onload = function() {
+        let progressBar = document.getElementById('progress-bar');
+        let percent = progressBar.getAttribute('data-percent');
+        progressBar.style.width = percent + '%';
+      };
+    </script>
+
+    <style>
+      .feed-box-false,
+      .feed-box-true {
+        width: 60%;
+        background-color: #f1f1f1;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        border: 1px solid black;
+      }
+
+      .complete_true {
+        background-color: #87CEFA;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        margin-top: 5px;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+
+      .complete_false{
+        background-color: #90EE90;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        margin-top: 5px;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+
+      .delete{
+        background-color: #FFB6C1;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        margin-top: 5px;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+
+      .complete_true:hover {
+        background-color: #B0E2FF;
+      }
+
+      .complete_false:hover {
+        background-color: #BDFCC9;
+      }
+
+      .delete:hover {
+        background-color: #FFD3E6;
+      }
+    </style>
+
+    <% for (var i = 0; i < postsfalse.length; i ++) { %>
+        <div class="feed-box-false">  
+          <h3>Todo: <%= postsfalse[i].content %></h3>
+          <h5>Complete: <%= postsfalse[i].complete %></h5>
+          <button class="complete_true" data-id="<%= postsfalse[i]._id %>">완료</button>
+          <button class="delete" data-id="<%= postsfalse[i]._id %>">삭제</button>
+        </div>
+    <% } %>
+
+    <% for (var i = 0; i < poststrue.length; i ++) { %>
+        <div class="feed-box-true">
+          <h3>Todo: <%= poststrue[i].content %></h3>
+          <h5>Complete: <%= poststrue[i].complete %></h5>
+          <button class="complete_false" data-id="<%= poststrue[i]._id %>">미완료</button>
+          <button class="delete" data-id="<%= poststrue[i]._id %>">삭제</button>
+        </div>
+    <% } %>
+
+    <script>
+      $('.complete_true').click((e) => {
+        var num = e.target.dataset.id;
+        $.ajax({
+          method: 'PUT',
+          url: '/main/put/true',
+          data: {_id: num, query: deadline}
+        }).done(function() {
+          alert('해당 Todo를 완료 처리했습니다!');
+        }).fail(function(a,b,c) {
+          console.log(a,b,c);
+        })
+      })
+
+      $('.complete_false').click((e) => {
+        var num = e.target.dataset.id;
+        $.ajax({
+          method: 'PUT',
+          url: '/main/put/false',
+          data: {_id: num, query: deadline}
+        }).done(function() {
+          alert('해당 Todo를 미완료 처리했습니다!');
+        }).fail(function(a,b,c) {
+          console.log(a,b,c);
+        })
+      })
+
+      $('.delete').click((e) => {
+        var num = e.target.dataset.id;
+        $.ajax({
+          method: 'DELETE',
+          url: '/main/delete',
+          data: {_id: num, query: deadline}
+        }).done(function() {
+          clickThis.parent('div').fadeOut();
+          alert('해당 Todo를 삭제하였습니다');
+        }).fail(function(a,b,c) {
+          console.log(a,b,c);
+        })
+      })
+    </script>
+</body>
+</html>

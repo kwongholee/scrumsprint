@@ -175,7 +175,7 @@ app.post('/register', function(req, res) {
         return res.send("<script>alert('비밀번호는 6~15자의 영문 대소문자를 사용해야 하며, 최소 1개 이상의 숫자 혹은 특수 문자를 포함했는지 확인해주세요!'); window.location.replace('/register'); </script>");
       }
       else if(!doublecheck) {
-        db.collection('user').insertOne({name: req.body.name, id : req.body.id, phonenumber: req.body.phonenumber, pw: createdPW, salt: createdSalt}, function(err, result) {
+        db.collection('user').insertOne({name: req.body.name, id : req.body.id, phonenumber: req.body.phonenumber, pw: createdPW, salt: createdSalt, group: [], groupleader: []}, function(err, result) {
           return res.redirect('/main/?time=today');
         })
       }
@@ -201,8 +201,36 @@ app.get('/main', Logined, (req,res) => { // 로그인하면 이 페이지로 넘
   })
 })
 
-app.get('/main/group', (req, res) => {
-  res.render('groupmake.ejs');
+app.get('/main/group', Logined, (req, res) => {
+  db.collection('user').findOne({id: req.query.user}, (err, result) => {
+    res.render('group.ejs', {id: req.query.user, group: result.group, groupleader: result.groupleader});
+  })
+})
+
+app.get('/main/group/make', (req, res) => {
+  res.render('groupmake.ejs', {id: req.user.id});
+})
+
+app.get('/main/group/private', (req, res) => {
+  db.collection('group').findOne({groupname: req.query.groupname}, (err, result) => {
+    return res.render('groupdetail.ejs', {group: result});
+  })
+})
+
+// 이코드 지금 문제 있음
+app.post('/main/group/code', (req, res) => {
+  db.collection('group').findOne({groupcode: req.body.code}, (err,result) => {
+    if(result.groupmember == 0) {
+      return res.status(200).send({message: 'it is not correct code'});
+    }
+    else {
+      db.collection('user').updateOne({id: req.user.id}, {$push: {group: result.groupname}}, (err2, result2) => {
+        db.collection('group').updateOne({groupname: result.groupname}, {$push: {groupmember: req.user.id}}, (err, result3) => {
+          return res.status(200).send({message: 'it was a correct code'});
+        })
+      })
+    }
+  })
 })
 
 app.get('/logout', Logined,  function (req, res, next)  {
@@ -252,9 +280,43 @@ app.delete('/main/delete', Logined, function(req, res) {
   })  
 })
 
+// 그룹명 정규식(아직 정규식이 완성이 안 됨)
+// function isGroupName(v) {
+//   let regex = /""/;
+
+//   return regex.test(v);
+// }
+
+function isGroupinfo(v) {
+  let regex = /^[ㄱ-ㅎㅏ-ㅣ가-힣]{1,20}$/;
+
+  return regex.test(v);
+}
+
+app.post('/groupmake', (req, res) => {
+  if(!isGroupinfo(req.body.groupinfo)) {
+    return res.send("<script>alert('그룹 정보는 반드시 한글로만 100자 이내로 입력해주세요!'); window.location.replace('/main/group/make'); </script>");
+  }
+  // else if(!isGroupName(req.body.groupname)) {
+  //   return res.send("<script>alert('그룹명은 반드시 한글,영어,숫자를 이용하여 10자 이내로 입력해주세요!'); window.location.replace('/main/group/make'); </script>");
+  // }
+  else {
+    db.collection('group').find().toArray((err, result) => {
+      for(var i = 0; i < result.length; i++) {
+        if(result[i].groupname == req.body.groupname) {
+          return res.send("<script>alert('해당 그룹명은 이미 존재합니다. 다른 그룹명을 입력해주세요'); window.location.replace('/main/group/make'); </script>");
+        }
+      }
+    })
+    db.collection('group').insertOne({groupname: req.body.groupname, groupinfo: req.body.groupinfo, groupleader: req.user.id, groupmember: [], groupcode: req.body.groupcode}, (err1, result1) => {
+      db.collection('user').updateOne({id: req.user.id}, {$push: {groupleader: req.body.groupname}}, (err2, result2) => {
+        return res.status(200).send({message: 'success to make a group'});
+      })
+    })
+  }
+})
 // 아이디 중복확인 버튼을 만드는 거 어떰? (잠깐 대기 맨 마지막에 구현해도 될 듯?)
 // 로그인 페이지랑 회원가입 페이지 꾸미기
-// 그룹 만들기 페이지 생성(그룹장, 그룹원, 초대 코드) (/main/?group=~)
-// 그룹에서 만든 스프린트는 작성자를 그룹으로 만들기
 // 00시 지나면 '오늘 할 일 '로 지정된 todo 지우기 ('node-cron')
 // 날짜도 기록해서 날짜별로 todo 뭐 있었는지 볼 수 있게 하기
+// groupname 중복 검사 ㄱㄱ

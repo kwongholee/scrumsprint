@@ -12,6 +12,7 @@
     <div>
         <h1 style="display: inline-block;"><i><%= id %></i> 님의 Sprint(달려라 달려)</h1>
         <button class="logout-button"><a href="/logout" style="color: #fff; text-decoration: none;">Logout</a></button>
+        <button id="group" class="logout-button">Group</button>
     </div>    
 
     <style>
@@ -76,6 +77,10 @@
 
       $('#project').click(() => {
         window.location.replace('/main/?time=project');
+      })
+
+      $('#group').click(() => {
+        window.location.replace('/main/group/?user=<%= id %>');
       })
     </script>
 

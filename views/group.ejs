@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <button class="button-group" style="display: block;"><a href="/main?time=today">Home</a></button>
+
+    <h1 style="display: inline-block;"><i><%= id %></i>'s Group Page</h1>
+    <button style="display: inline-block;" class="button-group"><a href="/main/group/make">그룹 생성</a></button>
+    <br>
+
+    <div>
+        <label>초대코드 입력</label>
+        <input id="inputCode" type="text" name="code" placeholder="초대코드 입력">
+        <button id="codeSubmit">입력</button>
+    </div>
+
+    <script>
+        $("#codeSubmit").click(() => {
+            var code = $("#inputCode").val();
+            $.ajax({
+                method: 'POST',
+                data: {code: code},
+                url: '/main/group/code'
+            }).done(function() {
+                location.reload();
+            })
+        })
+    </script>
+
+    <style>
+        a {
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .button-group{
+        background-color: #90EE90;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        margin-top: 5px;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+
+      .button-group:hover {
+        background-color: #BDFCC9;
+        color: black;
+      }
+    </style>
+
+    <h3>Group Leader로 속해있는 그룹</h3>
+
+    <% if(groupleader != 0) { %>
+        <% for(var i = 0; i < groupleader.length; i++) { %>
+            <div class="feed-box-false">
+                <h3>Group Name: <%= groupleader[i] %></h3>
+                <button class="complete_true"><a href="/main/group/private/?groupname=<%= groupleader[i] %>">Get In</a></button>
+            </div>
+        <% } %>
+    <% } %>
+
+    <br>
+    <hr>
+    <h4>Group Member로 속해있는 그룹</h4>
+
+    <% if(group != 0) { %>
+        <% for(var i = 0; i < group.length; i++) { %>
+            <div class="feed-box-false">
+                <h3>Group Name: <%= group[i] %></h3>
+                <button class="complete_true"><a href="/main/group/private/?groupname=<%= group[i] %>">Get In</a></button>
+            </div>
+        <% } %>
+    <% } %>
+
+    <script>
+        $(".complete_true").click((e) => {
+            var data = e.target.data.id;
+            $.ajax({
+                method: 'GET',
+                data: {groupname: data},
+                url: `/main/group/private/?groupname=${data}`
+            }).done(function() {
+                window.location.replace(`/main/group/private/?groupname=${data}`);
+            })
+        })
+    </script>
+
+    <style>
+        .feed-box-false {
+          width: 60%;
+          background-color: #f1f1f1;
+          padding: 10px;
+          margin-bottom: 10px;
+          border-radius: 5px;
+          border: 1px solid black;
+        }
+  
+        .complete_true {
+          background-color: #87CEFA;
+          color: #fff;
+          border: none;
+          padding: 5px 10px;
+          margin-top: 5px;
+          border-radius: 3px;
+          cursor: pointer;
+        }
+  
+        .complete_true:hover {
+          background-color: #B0E2FF;
+        }
+      </style>
+</body>
+</html>

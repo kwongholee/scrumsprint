@@ -7,10 +7,86 @@
   <title>Document</title>
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+  <script>
+    function generateRandomNum() {
+      var randomNumber = Math.floor(Math.random() * 1000000);
+      var inputElement = document.getElementById("randomInput");
+      inputElement.value = randomNumber.toString().padStart(6, '0');
+    }
+  </script>
 </head>
 <body>
+    <button id="group" class="button-group">돌아가기</a></button>
+
+    <script>
+      $("#group").click(() => {
+        window.location.replace("/main/group/?user=<%= id %>")
+      })
+    </script>
+
+    <style>
+      a {
+        text-decoration: none;
+        color: #fff;
+      }
+
+      .button-group{
+        background-color: #90EE90;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        margin-top: 5px;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+
+      .button-group:hover {
+        background-color: #BDFCC9;
+        color: black;
+      }
+    </style>
+
     <div>
       <h3>Group Making Page</h3>
     </div>
+
+    <div>
+      <div>
+        <label>Group Name</label>
+        <input type="text" id="groupname">
+      </div>
+
+      <div>
+        <label>Information about Your Group</label>
+        <input type="text" id="groupinfo">
+      </div>
+
+      <div>
+        <label>초대 코드 생성</label>
+        <input id="randomInput" type="text" readonly>
+        <button onclick="generateRandomNum()">초대 코드 생성</button>
+      </div>
+
+      <div>
+        <button id="makegroup" class="button-group" type="submit">그룹 생성</button>
+      </div>
+    </div>
+
+    <script>
+      $("#makegroup").click(() => {
+        var groupname = $("#groupname").val();
+        var groupinfo = $("#groupinfo").val();
+        var groupcode = $("#randomInput").val(); //얘 왜 계속 null값을 보냄??????
+        console.log($("#randomInput").val());
+        $.ajax({
+          method: 'POST',
+          url: '/groupmake',
+          data: {groupname: groupname, groupinfo: groupinfo, groupcode: groupcode}
+        }).done(function() {
+          alert('그룹을 성공적으로 생성하였습니다!');
+          window.location.replace("/main/group/?user=<%= id %>");
+        })
+      })
+    </script>
 </body>
 </html>

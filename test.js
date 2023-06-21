@@ -1,2 +1,5 @@
-var a = []
-if(a == 0) console.log(1);
+function isEmptyJSON(a) {
+  return Object.keys(a).length === 0;
+}
+
+console.log(isEmptyJSON({}));

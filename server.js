@@ -45,6 +45,14 @@ app.get('/register', (req, res) => {
   res.render('register.ejs');
 })
 
+app.get('/fail', (req, res) => {
+  res.sendFile(__dirname + '/fail.html');
+})
+
+app.get('/find/user', (req, res) => {
+  res.render('finduser.ejs');
+})
+
 app.post('/login',passport.authenticate('local', { //로그인 value가 타당하면 로그인, 에러나면 /fail로 redirect
   failureRedirect: '/fail'
 }) ,function(req, res) {
@@ -217,11 +225,11 @@ app.get('/main/group/private', (req, res) => {
   })
 })
 
-// 이코드 지금 문제 있음
+// 코드를 잘못 입력했을 경우만 생각하면 될 듯
 app.post('/main/group/code', (req, res) => {
   db.collection('group').findOne({groupcode: req.body.code}, (err,result) => {
-    if(result.groupmember == 0) {
-      return res.status(200).send({message: 'it is not correct code'});
+    if(err) {
+      return res.status(200).send({message: 'it was a wrong code'});
     }
     else {
       db.collection('user').updateOne({id: req.user.id}, {$push: {group: result.groupname}}, (err2, result2) => {
@@ -260,7 +268,7 @@ app.put('/main/put/true', Logined, function(req,res) {
   db.collection('post').updateOne({_id: parseInt(req.body._id)}, {$set: {complete: 'true'}}, (err, result) => {
     if(err) console.log(err);
     else console.log('success to complete change to true');  
-    res.status(200).send({message: 'success to complete change to true'});
+    res.status(200).send({message: 'success to complete change to true'}); 
   })
 })
 

@@ -1,5 +1,8 @@
-function isEmptyJSON(a) {
-  return Object.keys(a).length === 0;
-}
+// function isEmptyJSON(a) {
+//   return Object.keys(a).length === 0;
+// }
 
-console.log(isEmptyJSON({}));
+// console.log(isEmptyJSON({}));
+
+var a;
+console.log(a == null);

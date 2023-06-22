@@ -9,22 +9,77 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
-    <!-- group detail 페이지는 잠깐 대기 -->
-    <!-- <script>
-        var a = "";
-    </script>
-
-    <% for(var i = 0; i < group.groupmember.length; i++) { %>
-        a = a + group.groupmember[i] + ", ";
-    <% } %> -->
+    
 
     <div>
-        <h1><%= group.groupname %> Page</h1>
+        <h1 style="display: inline-block;"><%= group.groupname %> Page</h1>
+        <button id="reallyDelete">그룹 삭제</button>
+
+        <div class="popup">
+            <h3>정말로 그룹을 삭제하시겠습니까?</h3>
+            <button id="deleteGroup">Yes</button>
+            <button id="noDelete" data-member="<%= group.groupmember %>" data-id="<%= group.groupname %>">No</button>
+        </div>
+
         <br>
         <h2>Group Name: <%= group.groupname %></h2>
         <p>Group Info: <%= group.groupinfo %></p>
         <h4>Group Leader: <%= group.groupleader %></h4>
-        <h5>Group Member: </h5>
+        <p>Group Code: <%= group.groupcode %></p>
+        <button><a href="/main/group/sprint/?time=project">스프린트</a></button>
+
+        <% for(var i = 0; i < group.groupmember.length; i++) { %>
+            <div>
+                <h4>Name: <%= group.groupmember[i] %></h4>
+                <button id="deleteMember" data-id="<%= group.groupmember[i] %>">추방</button>
+            </div>
+        <% } %>
     </div>
+
+    <style>
+        .popup {
+            display: none;
+        }
+    </style>
+
+    <script>
+        $('#reallyDelete').click(() => {
+            $(".popup").css('display', "block");
+        })
+
+        $("#noDelete").click(() => {
+            $(".popup").css('display', "none");
+        })
+
+        $("#deleteGroup").click((e) => {
+            var member = e.target.dataset.member;
+            $.ajax({
+                method: 'DELETE',
+                url:'/group/delete/?groupname=<%= group.groupname %>',
+                data: {member: member}
+            }).done(function() {
+                alert('그룹을 성공적으로 삭제하였습니다!');
+                window.location.replace('/main/group/?user=<%= id %>');
+            }).fail(function() {
+                alert('당신은 리더가 아니기 때문에 그룹을 삭제할 수 없습니다!');
+                location.reload();
+            })
+        })
+
+        $('#deleteMember').click((e) => {
+            var member = e.target.dataset.id;
+            $.ajax({
+                method: 'PUT',
+                url: '/groupmember/put/?groupname=<%= group.groupname %>',
+                data: {member: member}
+            }).done(function() {
+                alert('해당 멤버를 추방합니다!');
+                location.reload();
+            }).fail(function(a,b,c) {
+                alert('당신은 리더가 아니기 때문에 추방할 수 없습니다!');
+                location.reload();
+            })
+        })
+    </script>
 </body>
 </html>

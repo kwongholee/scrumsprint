@@ -76,7 +76,7 @@
       $("#makegroup").click(() => {
         var groupname = $("#groupname").val();
         var groupinfo = $("#groupinfo").val();
-        var groupcode = $("#randomInput").val(); //얘 왜 계속 null값을 보냄??????
+        var groupcode = $("#randomInput").val();
         console.log($("#randomInput").val());
         $.ajax({
           method: 'POST',
@@ -85,6 +85,9 @@
         }).done(function() {
           alert('그룹을 성공적으로 생성하였습니다!');
           window.location.replace("/main/group/?user=<%= id %>");
+        }).fail(function(a,b,c) {
+          alert('해당 그룹은 이미 존재합니다. 다른 그룹명을 입력해주세요!');
+          location.reload();
         })
       })
     </script>

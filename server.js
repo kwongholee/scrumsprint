@@ -221,22 +221,28 @@ app.get('/main/group/make', (req, res) => {
 
 app.get('/main/group/private', (req, res) => {
   db.collection('group').findOne({groupname: req.query.groupname}, (err, result) => {
-    return res.render('groupdetail.ejs', {group: result});
+    return res.render('groupdetail.ejs', {group: result, id: req.user.id});
   })
 })
 
-// 코드를 잘못 입력했을 경우만 생각하면 될 듯
 app.post('/main/group/code', (req, res) => {
-  db.collection('group').findOne({groupcode: req.body.code}, (err,result) => {
-    if(err) {
-      return res.status(200).send({message: 'it was a wrong code'});
+  var resultGroup;
+  db.collection('group').find().toArray((err, result) => {
+    for(var i = 0; i < result.length; i++) {
+      if(result[i].groupcode == req.body.code) {
+        resultGroup = result[i];
+        break;
+      }
     }
-    else {
-      db.collection('user').updateOne({id: req.user.id}, {$push: {group: result.groupname}}, (err2, result2) => {
-        db.collection('group').updateOne({groupname: result.groupname}, {$push: {groupmember: req.user.id}}, (err, result3) => {
+    if(resultGroup != null) {
+      db.collection('user').updateOne({id: req.user.id}, {$push: {group: resultGroup.groupname}}, (err2, result2) => {
+        db.collection('group').updateOne({groupname: resultGroup.groupname}, {$push: {groupmember: req.user.id}}, (err, result3) => {
           return res.status(200).send({message: 'it was a correct code'});
         })
       })
+    }
+    else {
+      return res.status(400).send("<script>alert('잘못된 코드를 입력하였습니다. 다시 한 번 입력해주세요!'); location.reload(); </script>")
     }
   })
 })
@@ -312,19 +318,62 @@ app.post('/groupmake', (req, res) => {
     db.collection('group').find().toArray((err, result) => {
       for(var i = 0; i < result.length; i++) {
         if(result[i].groupname == req.body.groupname) {
-          return res.send("<script>alert('해당 그룹명은 이미 존재합니다. 다른 그룹명을 입력해주세요'); window.location.replace('/main/group/make'); </script>");
+          return res.status(400).send("<script>alert('해당 그룹명은 이미 존재합니다. 다른 그룹명을 입력해주세요'); window.location.replace('/main/group/make'); </script>");
         }
       }
-    })
-    db.collection('group').insertOne({groupname: req.body.groupname, groupinfo: req.body.groupinfo, groupleader: req.user.id, groupmember: [], groupcode: req.body.groupcode}, (err1, result1) => {
-      db.collection('user').updateOne({id: req.user.id}, {$push: {groupleader: req.body.groupname}}, (err2, result2) => {
-        return res.status(200).send({message: 'success to make a group'});
+      db.collection('group').insertOne({groupname: req.body.groupname, groupinfo: req.body.groupinfo, groupleader: req.user.id, groupmember: [], groupcode: req.body.groupcode}, (err1, result1) => {
+        db.collection('user').updateOne({id: req.user.id}, {$push: {groupleader: req.body.groupname}}, (err2, result2) => {
+          return res.status(200).send({message: 'success to make a group'});
+        })
       })
     })
   }
 })
+
+app.put('/groupmember/put', (req, res) => {
+  db.collection('group').findOne({groupname: req.query.groupname}, (err, result) => {
+    if(result.groupleader != req.user.id) {
+      return res.status(400).send({message: 'you are not a groupleader'});
+    }
+    else {
+      db.collection('group').updateOne({groupname: req.query.groupname}, {$pull: {groupmember: req.body.member}}, (err, result) => {
+        if(err) console.log(err);
+        db.collection('user').updateOne({id: req.body.member}, {$pull: {group: req.query.groupname}}, (error, result) => {
+          if(error) console.log(error);
+          res.status(200).send({message: 'success to delete member'});
+        })
+      })
+    }
+  })
+})
+
+app.delete('/group/delete', (req, res) => {
+  db.collection('group').findOne({groupname: req.query.groupname}, (err, result) => {
+    if(result.groupleader != req.user.id) {
+      return res.status(400).send({message: 'you are not a groupleader'});
+    }
+    else {
+      var list = result.groupmember;
+      db.collection('group').deleteOne({groupname: req.query.groupname}, (err,result) => {
+        db.collection('user').updateOne({id: req.user.id}, {$pull: {groupleader: req.query.groupname}}, (err, result) => {
+          for(var i = 0; i < list.length; i++) {
+            db.collection('user').updateOne({id: list[i]}, {$pull: {group: req.query.groupname}}, (err, result) => {
+              if(err) console.log(err);
+              return res.status(200).send({message: "success to delete group"});
+            })
+          }
+        })
+      })
+    }
+  })
+})
+
+app.get('/main/group/sprint', (req, res) => {
+  res.render('groupsprint.ejs');
+})
+
 // 아이디 중복확인 버튼을 만드는 거 어떰? (잠깐 대기 맨 마지막에 구현해도 될 듯?)
-// 로그인 페이지랑 회원가입 페이지 꾸미기
 // 00시 지나면 '오늘 할 일 '로 지정된 todo 지우기 ('node-cron')
 // 날짜도 기록해서 날짜별로 todo 뭐 있었는지 볼 수 있게 하기
-// groupname 중복 검사 ㄱㄱ
+// group 내에서 스프린트 생성 가능
+// 나머지는 디자인 좀 몰두하자 ㅎㅎ

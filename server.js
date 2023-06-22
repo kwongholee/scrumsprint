@@ -369,7 +369,51 @@ app.delete('/group/delete', (req, res) => {
 })
 
 app.get('/main/group/sprint', (req, res) => {
-  res.render('groupsprint.ejs');
+  db.collection('post').find().toArray((err, result) => {
+    var postresultFalse = [];
+    var postresultTrue = [];
+    for(var i = 0; i < result.length; i++) {
+      if(result[i].writer == req.query.groupname) {
+        if(result[i].complete =="true") postresultTrue.push(result[i])
+        else postresultFalse.push(result[i])
+      }
+    }
+    var percent = 0;
+    if (postresultFalse.length != 0 || postresultTrue.length != 0) percent = postresultTrue.length / (postresultTrue.length+postresultFalse.length) * 100;
+    res.render('groupsprint.ejs', {groupname: req.query.groupname, postsfalse: postresultFalse, poststrue: postresultTrue, percent: percent});
+  })
+})
+
+app.post('/group/write', (req,res) => {
+  db.collection('counter').findOne({name: "postNum"}, (err,result) => {
+    var total = result.totalPost;
+    db.collection('post').insertOne({_id: total+1, writer: req.query.groupname, content: req.body.content, complete: 'false'}, (err, result) => {
+      db.collection('counter').updateOne({name: 'postNum'}, {$inc: {totalPost: 1}}, (err, result) => {
+        res.status(200).send({message: "success to post in groupname"});
+      })
+    })
+  })
+})
+
+app.put('/main/group/put/true', Logined, function(req,res) {
+  db.collection('post').updateOne({_id: parseInt(req.body._id)}, {$set: {complete: 'true'}}, (err, result) => {
+    if(err) console.log(err);
+    res.status(200).send({message: 'success to complete change to true'}); 
+  })
+})
+
+app.put('/main/group/put/false', Logined, function(req,res) {
+  db.collection('post').updateOne({_id: parseInt(req.body._id)}, {$set: {complete: 'false'}}, (err, result) => {
+    if(err) console.log(err);
+    res.status(200).send({message: 'success to complete change to false'});
+  })
+})
+
+app.delete('/main/group/delete', Logined, function(req, res) {
+  db.collection('post').deleteOne({_id: parseInt(req.body._id)}, (err, result) => {
+    if(err) console.log(err);
+    res.status(200).send({message: 'success to delete'});
+  })  
 })
 
 // 아이디 중복확인 버튼을 만드는 거 어떰? (잠깐 대기 맨 마지막에 구현해도 될 듯?)

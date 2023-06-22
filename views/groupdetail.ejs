@@ -9,7 +9,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
-    
+    <button class="back-btn">Go Back</button>
+
+    <style>
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #ff4d4d;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+          }
+        
+          .back-btn:hover {
+            background-color: #ff6666;
+          }
+    </style>
+
+    <script>
+        $(".back-btn").click(() => {
+            window.location.replace('/main/group/?user=<%= id %>');
+        })
+    </script>
 
     <div>
         <h1 style="display: inline-block;"><%= group.groupname %> Page</h1>
@@ -26,7 +50,7 @@
         <p>Group Info: <%= group.groupinfo %></p>
         <h4>Group Leader: <%= group.groupleader %></h4>
         <p>Group Code: <%= group.groupcode %></p>
-        <button><a href="/main/group/sprint/?time=project">스프린트</a></button>
+        <button><a href="/main/group/sprint/?groupname=<%= group.groupname %>">스프린트</a></button>
 
         <% for(var i = 0; i < group.groupmember.length; i++) { %>
             <div>

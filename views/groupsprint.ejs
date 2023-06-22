@@ -9,6 +9,307 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
+    <button class="group-btn">Back</button>
+
+    <style>
+        .group-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #ff4d4d;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+          }
+        
+          .group-btn:hover {
+            background-color: #ff6666;
+          }
+    </style>
+
+    <script>
+        $(".group-btn").click(() => {
+            window.location.replace("/main/group/private/?groupname=<%= groupname %>");
+        })
+    </script>
+
+    <div>
+        <h1 style="display: inline-block;"><i><%= groupname %></i> Group의 Sprint(달려라 달려)</h1>
+        <button class="logout-button"><a href="/logout" style="color: #fff; text-decoration: none;">Logout</a></button>
+    </div>    
+
+    <style>
+      .logout-button {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        background-color: #ff4d4d;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
     
+      .logout-button:hover {
+        background-color: #ff6666;
+      }
+    </style>
+
+    <div>
+      <input class="input" id="content" type="text" placeholder="할 일" size="50">
+      <button class="submitTodo" id="submitTodo" type="submit">스프린트 등록</button>
+    </div>
+
+    <style>
+      .input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+        width: 200px;
+        outline: none;
+      }
+
+      .input:focus {
+        border-color: #4c9aff;
+        box-shadow: 0 0 5px #4c9aff;
+      }
+
+      .submitTodo {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        background-color: #ffcc33;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .submitTodo:hover {
+        background-color: #ffdd66;
+      }
+    </style>
+
+    <script>
+      $('#submitTodo').click(() => {
+        var content = $('#content').val();
+        if(content != "") {
+          $.ajax({
+            type: 'POST',
+            url: "/group/write/?groupname=<%= groupname %>",
+            data: {content: content}
+          }).done(function() {
+            alert(`해당 Todo를 추가하였습니다!`);
+            location.reload();
+          }).fail(function(a,b,c) {
+            console.log(a,b,c);
+          })
+        }
+        else {
+          alert("Todo 입력란에 아무것도 입력 안 하셨어요");
+          location.reload();
+        }
+      })
+    </script>
+
+    <style>
+      .sprint-container {
+        width: 50%;
+        height: 30px;
+        background-color: #f1f1f1;
+        border-radius: 15px;
+        overflow: hidden;
+      }
+      
+      .sprint-progress {
+        height: 100%;
+        background-color: #4caf50;
+        transition: width 1s ease-in-out;
+      }
+
+      .sprint-progress-bar {
+        height: 100%;
+        transition: width 1s ease-in-out;
+      }
+
+      .sprint-icon {
+        font-size: 36px;
+        color: black;
+        position: relative;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+      }
+    </style>
+
+    <div>
+      <div style="display: inline;">
+        <h3>달성도: <%= percent %>%</h3>
+      </div>
+
+      <div  class="sprint-container">
+        <div class="sprint-progress" id="progress-bar1" data-percent="<%= percent %>">
+          <div class="sprint-progress-bar" id="progress-bar2" data-percent="<%= percent %>">
+            <i class="fas fa-running sprint-icon"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      window.onload = function() {
+        let progressBar1 = document.getElementById('progress-bar1');
+        let percent1 = progressBar1.getAttribute('data-percent');
+        progressBar1.style.width = percent1 + '%';
+
+        let progressBar2 = document.getElementById('progress-bar2');
+        let percent2 = progressBar2.getAttribute('data-percent');
+        progressBar2.style.width = percent2 + '%';
+
+        let sprintIcon = document.querySelector('.sprint-icon');
+        let sprintProgressBar = document.querySelector('.sprint-progress-bar');
+        
+        let targetPercent = percent2;
+        let targetPosition = (targetPercent / 100) * progressBar2.offsetWidth;
+        let currentPosition = 0;
+        
+        let interval = setInterval(moveSprintIcon, 10);
+        
+        function moveSprintIcon() {
+          if (currentPosition >= targetPosition) {
+            clearInterval(interval);
+          } else {
+            let increment = (targetPosition - currentPosition) / 100; // 증분 계산
+            currentPosition += increment;
+            sprintIcon.style.left = currentPosition + 'px';
+            sprintProgressBar.style.width = (currentPosition / progressBar2.offsetWidth) * 100 + '%';
+          }
+        }
+      };
+    </script>
+
+    <style>
+      .feed-box-false,
+      .feed-box-true {
+        width: 60%;
+        background-color: #f1f1f1;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        border: 1px solid black;
+      }
+
+      .complete_true {
+        background-color: #87CEFA;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        margin-top: 5px;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+
+      .complete_false{
+        background-color: #90EE90;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        margin-top: 5px;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+
+      .delete{
+        background-color: #FFB6C1;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        margin-top: 5px;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+
+      .complete_true:hover {
+        background-color: #B0E2FF;
+      }
+
+      .complete_false:hover {
+        background-color: #BDFCC9;
+      }
+
+      .delete:hover {
+        background-color: #FFD3E6;
+      }
+    </style>
+
+    <% for (var i = 0; i < postsfalse.length; i ++) { %>
+        <div class="feed-box-false">  
+          <h3>Todo: <%= postsfalse[i].content %></h3>
+          <h5>Complete: <%= postsfalse[i].complete %></h5>
+          <button class="complete_true" data-id="<%= postsfalse[i]._id %>">완료</button>
+          <button class="delete" data-id="<%= postsfalse[i]._id %>">삭제</button>
+        </div>
+    <% } %>
+
+    <% for (var i = 0; i < poststrue.length; i ++) { %>
+        <div class="feed-box-true">
+          <h3>Todo: <%= poststrue[i].content %></h3>
+          <h5>Complete: <%= poststrue[i].complete %></h5>
+          <button class="complete_false" data-id="<%= poststrue[i]._id %>">미완료</button>
+          <button class="delete" data-id="<%= poststrue[i]._id %>">삭제</button>
+        </div>
+    <% } %>
+
+    <script>
+      $('.complete_true').click((e) => {
+        var num = e.target.dataset.id;
+        $.ajax({
+          method: 'PUT',
+          url: '/main/group/put/true',
+          data: {_id: num}
+        }).done(function(result) {
+          alert('해당 Todo를 완료 처리했습니다!');
+          location.reload();
+        }).fail(function(a,b,c) {
+          console.log(a,b,c);
+        })
+      })
+
+      $('.complete_false').click((e) => {
+        var num = e.target.dataset.id;
+        $.ajax({
+          method: 'PUT',
+          url: '/main/group/put/false',
+          data: {_id: num}
+        }).done(function(result) {
+          console.log('false');
+          alert('해당 Todo를 미완료 처리했습니다!');
+          location.reload();
+        }).fail(function(a,b,c) {
+          console.log(a,b,c);
+        })
+      })
+
+      $('.delete').click((e) => {
+        var num = e.target.dataset.id;
+        var clickThis = $(this);
+        $.ajax({
+          method: 'DELETE',
+          url: '/main/group/delete',
+          data: {_id: num}
+        }).done(function(result) {
+          clickThis.parent('div').fadeOut();
+          alert('해당 Todo를 삭제하였습니다');
+          location.reload();
+        }).fail(function(a,b,c) {
+          console.log(a,b,c);
+        })
+      })
+    </script>
 </body>
 </html>

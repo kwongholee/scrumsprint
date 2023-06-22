@@ -16,7 +16,35 @@
   </script>
 </head>
 <body>
-    <button id="group" class="button-group">돌아가기</a></button>
+    <div class="container">
+      <button id="group" class="button-group">돌아가기</a></button>
+
+      <div>
+        <h1>Group Making Page</h1>
+      </div>
+
+      <div>
+        <div>
+          <label>Group Name</label>
+          <input type="text" id="groupname">
+        </div>
+
+        <div>
+          <label>Information about Your Group</label>
+          <input type="text" id="groupinfo">
+        </div>
+
+        <div>
+          <label>초대 코드 생성</label>
+          <input id="randomInput" type="text" readonly>
+          <button onclick="generateRandomNum()">초대 코드 생성</button>
+        </div>
+
+        <div>
+          <button id="makegroup" class="button-group" type="submit">그룹 생성</button>
+        </div>
+      </div>
+    </div>
 
     <script>
       $("#group").click(() => {
@@ -42,35 +70,8 @@
 
       .button-group:hover {
         background-color: #BDFCC9;
-        color: black;
       }
     </style>
-
-    <div>
-      <h3>Group Making Page</h3>
-    </div>
-
-    <div>
-      <div>
-        <label>Group Name</label>
-        <input type="text" id="groupname">
-      </div>
-
-      <div>
-        <label>Information about Your Group</label>
-        <input type="text" id="groupinfo">
-      </div>
-
-      <div>
-        <label>초대 코드 생성</label>
-        <input id="randomInput" type="text" readonly>
-        <button onclick="generateRandomNum()">초대 코드 생성</button>
-      </div>
-
-      <div>
-        <button id="makegroup" class="button-group" type="submit">그룹 생성</button>
-      </div>
-    </div>
 
     <script>
       $("#makegroup").click(() => {

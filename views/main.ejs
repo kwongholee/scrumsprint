@@ -6,14 +6,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
 </head>
 <body>
-    <div>
-        <h1 style="display: inline-block;"><i><%= id %></i> 님의 Sprint(달려라 달려)</h1>
-        <button class="logout-button"><a href="/logout" style="color: #fff; text-decoration: none;">Logout</a></button>
-        <button id="group" class="logout-button">Group</button>
-    </div>    
+    <div class="container">
+      <div class="mt-5" style="display: flex; align-items: center; justify-content: space-between;">
+          <button id="logout-btn" class="logout-button" style="order: 1;">Logout</button>
+          <h1 style="order: 2; margin: 0; text-align: center;"><i><%= id %></i> 님의 Sprint(달려라 달려)</h1>
+          <button id="group" class="logout-button" style="order: 3;">Group</button>
+      </div>
+        
+      <br>
+
+      <div style="display:flex; justify-content: space-between">
+        <button class="todayBtn" id="today">오늘 할 일</button>
+        <button class="projectBtn" id="project">이번 프로젝트에서 할 일</button>
+      </div>
+      <br>
+
+      <div style="display: flex; justify-content: flex-end">
+        <input class="input" id="content" type="text" placeholder="할 일" size="50">
+        <button class="submitTodo" id="submitTodo" type="submit">스프린트 등록</button>
+      </div>
+      <br>
+
+      <div>
+        <div style="display: inline;">
+          <h3>달성도: <%= percent %>%</h3>
+        </div>
+
+        <div  class="sprint-container">
+          <div class="sprint-progress" id="progress-bar1" data-percent="<%= percent %>"></div>
+        </div>
+      </div>
+      <br>
+
+      <% for (var i = 0; i < postsfalse.length; i ++) { %>
+          <div class="feed-box-false">  
+            <h3>Todo: <%= postsfalse[i].content %></h3>
+            <div style="display: flex; align-items: center;">
+              <h5 style="display: inline-block; flex: 1;">Complete: <%= postsfalse[i].complete %></h5>
+              <button class="complete_true" data-id="<%= postsfalse[i]._id %>">완료</button>
+              <span style="margin-left: 10px;"></span> 
+              <button class="delete" data-id="<%= postsfalse[i]._id %>">삭제</button>
+            </div>
+          </div>
+      <% } %>
+
+      <% for (var i = 0; i < poststrue.length; i ++) { %>
+          <div class="feed-box-true">
+            <h3>Todo: <%= poststrue[i].content %></h3>
+            <div style="display: flex; align-items: center;">
+              <h5 style="display: inline-block; flex: 1;">Complete: <%= poststrue[i].complete %></h5>
+              <button class="complete_false" data-id="<%= poststrue[i]._id %>">미완료</button>
+              <span style="margin-left: 10px;"></span> 
+              <button class="delete" data-id="<%= poststrue[i]._id %>">삭제</button>
+            </div>
+          </div>
+      <% } %>
+    </div>
+
+    <script>
+      $("#logout-btn").click(() => {
+        window.location.replace('/logout');
+      })
+    </script>
 
     <style>
       .logout-button {
@@ -33,11 +90,6 @@
       }
     </style>
 
-    <div>
-      <button class="todayBtn" id="today">오늘 할 일</button>
-      <button class="projectBtn" id="project">이번 프로젝트에서 할 일</button>
-    </div>
-
     <style>
       .todayBtn {
         display: inline-block;
@@ -49,6 +101,8 @@
         border: none;
         cursor: pointer;
         transition: background-color 0.3s;
+        order: -1;
+        margin-right: 10px;
       }
       .todayBtn:hover {
         background-color: #ff7db2;
@@ -64,6 +118,7 @@
         border: none;
         cursor: pointer;
         transition: background-color 0.3s;
+        order: 1;
       }
       .projectBtn:hover {
         background-color: #925cd9;
@@ -84,19 +139,16 @@
       })
     </script>
 
-    <div>
-      <input class="input" id="content" type="text" placeholder="할 일" size="50">
-      <button class="submitTodo" id="submitTodo" type="submit">스프린트 등록</button>
-    </div>
-
     <style>
       .input {
         padding: 10px;
         border: 1px solid #ccc;
         border-radius: 5px;
-        font-size: 16px;
-        width: 200px;
+        font-size: 20px;
+        width: 80%;
         outline: none;
+        flex: 1;
+        margin-right: 10px;
       }
 
       .input:focus {
@@ -114,6 +166,7 @@
         border: none;
         cursor: pointer;
         transition: background-color 0.3s;
+        flex: none;
       }
 
       .submitTodo:hover {
@@ -149,84 +202,44 @@
 
     <style>
       .sprint-container {
-        width: 50%;
+        position: relative;
+        width: 100%;
         height: 30px;
         background-color: #f1f1f1;
         border-radius: 15px;
         overflow: hidden;
       }
-      
+    
       .sprint-progress {
         height: 100%;
         background-color: #4caf50;
         transition: width 1s ease-in-out;
+        width: 0;
       }
-
-      .sprint-progress-bar {
-        height: 100%;
-        transition: width 1s ease-in-out;
-      }
-
+    
       .sprint-icon {
         font-size: 36px;
         color: black;
-        position: relative;
+        position: absolute;
         top: 50%;
-        left: 0;
-        transform: translateY(-50%);
+        transform: translate(-50%, -50%);
+        transition: left 1s ease-in-out;
       }
     </style>
-
-    <div>
-      <div style="display: inline;">
-        <h3>달성도: <%= percent %>%</h3>
-      </div>
-
-      <div  class="sprint-container">
-        <div class="sprint-progress" id="progress-bar1" data-percent="<%= percent %>">
-          <div class="sprint-progress-bar" id="progress-bar2" data-percent="<%= percent %>">
-            <i class="fas fa-running sprint-icon"></i>
-          </div>
-        </div>
-      </div>
-    </div>
     
     <script>
       window.onload = function() {
         let progressBar1 = document.getElementById('progress-bar1');
         let percent1 = progressBar1.getAttribute('data-percent');
         progressBar1.style.width = percent1 + '%';
-
-        let progressBar2 = document.getElementById('progress-bar2');
-        let percent2 = progressBar2.getAttribute('data-percent');
-        progressBar2.style.width = percent2 + '%';
-
-        let sprintIcon = document.querySelector('.sprint-icon');
-        let sprintProgressBar = document.querySelector('.sprint-progress-bar');
-        
-        let targetPercent = percent2;
-        let targetPosition = (targetPercent / 100) * progressBar2.offsetWidth;
-        let currentPosition = 0;
-        
-        let interval = setInterval(moveSprintIcon, 10);
-        
-        function moveSprintIcon() {
-          if (currentPosition >= targetPosition) {
-            clearInterval(interval);
-          } else {
-            let increment = (targetPosition - currentPosition) / 100; // 증분 계산
-            currentPosition += increment;
-            sprintIcon.style.left = currentPosition + 'px';
-            sprintProgressBar.style.width = (currentPosition / progressBar2.offsetWidth) * 100 + '%';
-          }
-        }
       };
     </script>
+    
 
     <style>
       .feed-box-false,
       .feed-box-true {
-        width: 60%;
+        width: 100%;
         background-color: #f1f1f1;
         padding: 10px;
         margin-bottom: 10px;
@@ -242,6 +255,8 @@
         margin-top: 5px;
         border-radius: 3px;
         cursor: pointer;
+        display: inline-block;
+        position: right;
       }
 
       .complete_false{
@@ -252,6 +267,7 @@
         margin-top: 5px;
         border-radius: 3px;
         cursor: pointer;
+        display: inline-block;
       }
 
       .delete{
@@ -262,6 +278,7 @@
         margin-top: 5px;
         border-radius: 3px;
         cursor: pointer;
+        display: inline-block;
       }
 
       .complete_true:hover {
@@ -276,24 +293,6 @@
         background-color: #FFD3E6;
       }
     </style>
-
-    <% for (var i = 0; i < postsfalse.length; i ++) { %>
-        <div class="feed-box-false">  
-          <h3>Todo: <%= postsfalse[i].content %></h3>
-          <h5>Complete: <%= postsfalse[i].complete %></h5>
-          <button class="complete_true" data-id="<%= postsfalse[i]._id %>">완료</button>
-          <button class="delete" data-id="<%= postsfalse[i]._id %>">삭제</button>
-        </div>
-    <% } %>
-
-    <% for (var i = 0; i < poststrue.length; i ++) { %>
-        <div class="feed-box-true">
-          <h3>Todo: <%= poststrue[i].content %></h3>
-          <h5>Complete: <%= poststrue[i].complete %></h5>
-          <button class="complete_false" data-id="<%= poststrue[i]._id %>">미완료</button>
-          <button class="delete" data-id="<%= poststrue[i]._id %>">삭제</button>
-        </div>
-    <% } %>
 
     <script>
       $('.complete_true').click((e) => {

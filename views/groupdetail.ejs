@@ -7,9 +7,37 @@
     <title>Document</title>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
 </head>
 <body>
-    <button class="back-btn">Go Back</button>
+    <div class="container">
+        <button class="back-btn">Go Back</button>
+
+        <div>
+            <h1 style="display: inline-block;"><%= group.groupname %> Page</h1>
+            <button id="reallyDelete">그룹 삭제</button>
+
+            <div class="popup">
+                <h3>정말로 그룹을 삭제하시겠습니까?</h3>
+                <button id="deleteGroup">Yes</button>
+                <button id="noDelete" data-member="<%= group.groupmember %>" data-id="<%= group.groupname %>">No</button>
+            </div>
+
+            <br>
+            <h2>Group Name: <%= group.groupname %></h2>
+            <p>Group Info: <%= group.groupinfo %></p>
+            <h4>Group Leader: <%= group.groupleader %></h4>
+            <p>Group Code: <%= group.groupcode %></p>
+            <button><a href="/main/group/sprint/?groupname=<%= group.groupname %>">스프린트</a></button>
+
+            <% for(var i = 0; i < group.groupmember.length; i++) { %>
+                <div>
+                    <h4>Name: <%= group.groupmember[i] %></h4>
+                    <button id="deleteMember" data-id="<%= group.groupmember[i] %>">추방</button>
+                </div>
+            <% } %>
+        </div>
+    </div>
 
     <style>
         .back-btn {
@@ -34,31 +62,6 @@
             window.location.replace('/main/group/?user=<%= id %>');
         })
     </script>
-
-    <div>
-        <h1 style="display: inline-block;"><%= group.groupname %> Page</h1>
-        <button id="reallyDelete">그룹 삭제</button>
-
-        <div class="popup">
-            <h3>정말로 그룹을 삭제하시겠습니까?</h3>
-            <button id="deleteGroup">Yes</button>
-            <button id="noDelete" data-member="<%= group.groupmember %>" data-id="<%= group.groupname %>">No</button>
-        </div>
-
-        <br>
-        <h2>Group Name: <%= group.groupname %></h2>
-        <p>Group Info: <%= group.groupinfo %></p>
-        <h4>Group Leader: <%= group.groupleader %></h4>
-        <p>Group Code: <%= group.groupcode %></p>
-        <button><a href="/main/group/sprint/?groupname=<%= group.groupname %>">스프린트</a></button>
-
-        <% for(var i = 0; i < group.groupmember.length; i++) { %>
-            <div>
-                <h4>Name: <%= group.groupmember[i] %></h4>
-                <button id="deleteMember" data-id="<%= group.groupmember[i] %>">추방</button>
-            </div>
-        <% } %>
-    </div>
 
     <style>
         .popup {

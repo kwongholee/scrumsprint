@@ -273,7 +273,6 @@ app.post('/write', Logined, function(req, res) {
 app.put('/main/put/true', Logined, function(req,res) {
   db.collection('post').updateOne({_id: parseInt(req.body._id)}, {$set: {complete: 'true'}}, (err, result) => {
     if(err) console.log(err);
-    else console.log('success to complete change to true');  
     res.status(200).send({message: 'success to complete change to true'}); 
   })
 })
@@ -281,7 +280,6 @@ app.put('/main/put/true', Logined, function(req,res) {
 app.put('/main/put/false', Logined, function(req,res) {
   db.collection('post').updateOne({_id: parseInt(req.body._id)}, {$set: {complete: 'false'}}, (err, result) => {
     if(err) console.log(err);
-    else console.log('success to complete change to false');  
     res.status(200).send({message: 'success to complete change to false'});
   })
 })
@@ -289,7 +287,6 @@ app.put('/main/put/false', Logined, function(req,res) {
 app.delete('/main/delete', Logined, function(req, res) {
   db.collection('post').deleteOne({_id: parseInt(req.body._id)}, (err, result) => {
     if(err) console.log(err);
-    else console.log('success to delete');
     res.status(200).send({message: 'success to delete'});
   })  
 })
@@ -417,7 +414,6 @@ app.delete('/main/group/delete', Logined, function(req, res) {
 })
 
 // 아이디 중복확인 버튼을 만드는 거 어떰? (잠깐 대기 맨 마지막에 구현해도 될 듯?)
-// 00시 지나면 '오늘 할 일 '로 지정된 todo 지우기 ('node-cron')
-// 날짜도 기록해서 날짜별로 todo 뭐 있었는지 볼 수 있게 하기
-// group 내에서 스프린트 생성 가능
+// group 이름 정규식 만들기
+// 날짜도 기록해서 날짜별로 todo 뭐 있었는지 볼 수 있게 하기(이건 어떡할까 구현할까 말까)
 // 나머지는 디자인 좀 몰두하자 ㅎㅎ

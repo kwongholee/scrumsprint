@@ -18,7 +18,7 @@
         </div>
         <br>
 
-        <div class="container2">
+        <div class="container2 mt-5">
             <label class="left" style="font-size: 20px;"><strong>초대코드 입력</strong></label>
             <div class="center"></div>
             <div class="right">
@@ -67,17 +67,23 @@
 
         $("#codeSubmit").click(() => {
             var code = $("#inputCode").val();
-            $.ajax({
-                method: 'POST',
-                data: {code: code},
-                url: '/main/group/code'
-            }).done(function() {
-                alert('그룹에 성공적으로 입장하셨습니다!');
+            if(code == "") {
+                alert("코드를 입력하지 않으셨습니다. 코드를 입력해주세요!");
                 location.reload();
-            }).fail(function(a,b,c) {
-                alert('잘못된 코드를 입력하셨습니다. 다시 한 번 시도해주세요!');
-                location.reload();
-            })
+            }
+            else {
+                $.ajax({
+                    method: 'POST',
+                    data: {code: code},
+                    url: '/main/group/code'
+                }).done(function() {
+                    alert('그룹에 성공적으로 입장하셨습니다!');
+                    location.reload();
+                }).fail(function(a,b,c) {
+                    alert('잘못된 코드를 입력하셨습니다. 다시 한 번 시도해주세요!');
+                    location.reload();
+                })
+            }
         })
     </script>
 

@@ -17,30 +17,37 @@
 </head>
 <body>
     <div class="container">
-      <button id="group" class="button-group">돌아가기</a></button>
-
-      <div>
-        <h1>Group Making Page</h1>
+      <div class="mt-5" style="display: flex; justify-content: flex-start">
+        <button id="group" class="button-group">돌아가기</button>
       </div>
 
-      <div>
+      <div class="mt-5">
+        <h1 style="text-align: center;">그룹 생성</h1>
+      </div>
+
+      <h3 class="mt-5" style="text-align: center; font-size: 25px">✔️ 그룹 이름에 대해서 중복은 불가능합니다 ✔️</h3>
+
+
+      <div class="mt-5">
         <div>
-          <label>Group Name</label>
-          <input type="text" id="groupname">
+          <label style="display: block; font-size: 30px">그룹 이름 (10자 이내/ 한글, 영어, 숫자 혼용 가능)</label>
+          <input class="input" type="text" id="groupname">
         </div>
 
-        <div>
-          <label>Information about Your Group</label>
-          <input type="text" id="groupinfo">
+        <div class="mt-5">
+          <label style="font-size: 30px">그룹에 대한 간략한 정보 (한글로만 100자 이내 작성 가능)</label>
+          <input class="input" type="text" id="groupinfo">
         </div>
 
-        <div>
-          <label>초대 코드 생성</label>
-          <input id="randomInput" type="text" readonly>
-          <button onclick="generateRandomNum()">초대 코드 생성</button>
+        <div class="mt-5">
+          <label style="display: block; font-size: 30px">초대 코드 생성 (오른쪽 버튼 누르면 자동 생성됨)</label>
+          <div style="display: flex;">
+            <input class="input" id="randomInput" type="text" readonly>
+            <button onclick="generateRandomNum()" class="randnum-button" style="margin-left: auto;">초대 코드 생성</button>
+          </div>          
         </div>
 
-        <div>
+        <div class="mt-5" style="display: flex; justify-content: flex-end">
           <button id="makegroup" class="button-group" type="submit">그룹 생성</button>
         </div>
       </div>
@@ -53,9 +60,20 @@
     </script>
 
     <style>
-      a {
-        text-decoration: none;
-        color: #fff;
+      .input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 20px;
+        width: 80%;
+        outline: none;
+        flex: 1;
+        margin-right: 10px;
+      }
+
+      .input:focus {
+        border-color: #4c9aff;
+        box-shadow: 0 0 5px #4c9aff;
       }
 
       .button-group{
@@ -66,10 +84,28 @@
         margin-top: 5px;
         border-radius: 3px;
         cursor: pointer;
+        width: 100px;
+        height: 50px;
       }
 
       .button-group:hover {
         background-color: #BDFCC9;
+      }
+
+      .randnum-button {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        background-color: #ff4d4d;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+    
+      .randnum-button:hover {
+        background-color: #ff6666;
       }
     </style>
 
@@ -78,18 +114,31 @@
         var groupname = $("#groupname").val();
         var groupinfo = $("#groupinfo").val();
         var groupcode = $("#randomInput").val();
-        console.log($("#randomInput").val());
-        $.ajax({
-          method: 'POST',
-          url: '/groupmake',
-          data: {groupname: groupname, groupinfo: groupinfo, groupcode: groupcode}
-        }).done(function() {
-          alert('그룹을 성공적으로 생성하였습니다!');
-          window.location.replace("/main/group/?user=<%= id %>");
-        }).fail(function(a,b,c) {
-          alert('해당 그룹은 이미 존재합니다. 다른 그룹명을 입력해주세요!');
+        if(groupname == "") {
+          alert("그룹명을 입력해주세요");
           location.reload();
-        })
+        }
+        else if(groupinfo == "") {
+          alert("그룹 정보를 입력해주세요");
+          location.reload();
+        }
+        else if(groupcode == "") {
+          alert("그룹 코드를 생성해주세요");
+          location.reload();
+        }
+        else {
+          $.ajax({
+            method: 'POST',
+            url: '/groupmake',
+            data: {groupname: groupname, groupinfo: groupinfo, groupcode: groupcode}
+          }).done(function() {
+            alert('그룹을 성공적으로 생성하였습니다!');
+            window.location.replace("/main/group/?user=<%= id %>");
+          }).fail(function(a,b,c) {
+            alert('그룹 생성 조건을 어기셨습니다! 조건을 다시 한 번 확인해주세요');
+            location.reload();
+          })
+        }
       })
     </script>
 </body>

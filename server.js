@@ -167,17 +167,17 @@ app.post('/register', function(req, res) {
       result.map((a,i) => {
         if(a.id == req.body.id) {
           doublecheck = true;
-          return res.send("<script>alert('이미 사용중인 아이디입니다! 다른 아이디를 사용해주세요!'); window.location.replace('/register'); </script>");
+          return res.send("<script>alert('이미 사용중인 아이디입니다! 다른 아이디를 사용해주세요!');  window.location.replace('/register'); </script>");
         }
       })
       if(!isKoreanName(req.body.name)) {
-        return res.send("<script>alert('한글로 이름을 작성해주세요!'); window.location.replace('/register'); </script>")
+        return res.send("<script>alert('한글로 이름을 작성해주세요!');  window.location.replace('/register'); </script>")
       }
       else if(!isID(req.body.id)) {
-        return res.send("<script>alert('4자 이상 20자 이하의 영문 아이디 형식을 지켜주세요!'); window.location.replace('/register'); </script>");
+        return res.send("<script>alert('4자 이상 20자 이하의 영문 아이디 형식을 지켜주세요!');  window.location.replace('/register'); </script>");
       }
       else if(!isPhoneNum(req.body.phonenumber)) {
-        return res.send("<script>alert('전화번호를 입력해주세요!'); window.location.replace('/register'); </script>");
+        return res.send("<script>alert('전화번호를 입력해주세요!');  window.location.replace('/register'); </script>");
       }
       else if(!isPW(req.body.pw)) {
         return res.send("<script>alert('비밀번호는 6~15자의 영문 대소문자를 사용해야 하며, 최소 1개 이상의 숫자 혹은 특수 문자를 포함했는지 확인해주세요!'); window.location.replace('/register'); </script>");

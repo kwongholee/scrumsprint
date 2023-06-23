@@ -11,29 +11,47 @@
 </head>
 <body>
     <div class="container">
-        <button class="back-btn">Go Back</button>
+        <div class="mt-5">
+            <div style="display: flex; justify-content: space-between;">
+                <button style="order: 1;" class="back-btn" id="back-btn">Go Back</button>
+                <h1 style="order: 2"><i><%= group.groupname %></i> Page</h1>
+                <button style="order: 3;" id="reallyDelete" class="back-btn">그룹 삭제</button>
+            </div>
 
-        <div>
-            <h1 style="display: inline-block;"><%= group.groupname %> Page</h1>
-            <button id="reallyDelete">그룹 삭제</button>
+            <div class="mt-1">
+            </div>
 
             <div class="popup">
-                <h3>정말로 그룹을 삭제하시겠습니까?</h3>
+                <h3 style="text-align: center;">정말로 그룹을 삭제하시겠습니까?</h3>
+                <p style="text-align: center;">당연히 그룹 삭제는 "그룹 리더"만 가능합니다</p>
                 <button id="deleteGroup">Yes</button>
                 <button id="noDelete" data-member="<%= group.groupmember %>" data-id="<%= group.groupname %>">No</button>
             </div>
 
             <br>
-            <h2>Group Name: <%= group.groupname %></h2>
-            <p>Group Info: <%= group.groupinfo %></p>
-            <h4>Group Leader: <%= group.groupleader %></h4>
-            <p>Group Code: <%= group.groupcode %></p>
-            <button><a href="/main/group/sprint/?groupname=<%= group.groupname %>">스프린트</a></button>
+            <div class="mt-3">
+                <h2>Group Name: <%= group.groupname %></h2>
+                <h3 class="mt-3">Group Info: <%= group.groupinfo %></h3>
+                <h3 class="mt-3">Group Leader: <%= group.groupleader %></h3>
+                <h3 class="mt-3">Group Code: <%= group.groupcode %></h3>
+                <div class="box">
+                    <h4 style="margin: 0">그룹 스프린트 페이지</h4>
+                    <button class="sprint-btn mt-3">스프린트</button>
+                </div>
+            </div>
+            <br>
+            <hr>
+            <br>
+
+            <div>
+                <h4 style="text-align: center;"><멤버리스트></h4>
+                <p style="text-align: center;">당연히 추방은 "그룹 리더"만 가능합니다</p>
+            </div>
 
             <% for(var i = 0; i < group.groupmember.length; i++) { %>
-                <div>
-                    <h4>Name: <%= group.groupmember[i] %></h4>
-                    <button id="deleteMember" data-id="<%= group.groupmember[i] %>">추방</button>
+                <div class="member-box mt-4">
+                    <h4>ID: <%= group.groupmember[i] %></h4>
+                    <button class="deleteMember-btn" id="deleteMember" data-id="<%= group.groupmember[i] %>">추방</button>
                 </div>
             <% } %>
         </div>
@@ -55,11 +73,67 @@
           .back-btn:hover {
             background-color: #ff6666;
           }
+
+          .box {
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+          }
+
+          .sprint-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #a86eeb;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            order: 1;
+          }
+          .sprint-btn:hover {
+            background-color: #925cd9;
+          }
+
+          .member-box {
+                width: 100%;
+                background-color: #f1f1f1;
+                padding: 10px;
+                margin-bottom: 10px;
+                border-radius: 5px;
+                border: 1px solid black;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+          .member-box h4 {
+            margin: 0;
+          }
+
+          .deleteMember-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #ff94c2;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+          }
+          .deleteMember-btn:hover {
+            background-color: #ff7db2;
+          }
     </style>
 
     <script>
-        $(".back-btn").click(() => {
+        $("#back-btn").click(() => {
             window.location.replace('/main/group/?user=<%= id %>');
+        })
+
+        $(".sprint-btn").click(() => {
+            window.location.replace("/main/group/sprint/?groupname=<%= group.groupname %>");
         })
     </script>
 
@@ -67,15 +141,19 @@
         .popup {
             display: none;
         }
+
+        .popup-box {
+            display: block;
+        }
     </style>
 
     <script>
         $('#reallyDelete').click(() => {
-            $(".popup").css('display', "block");
+            $(".popup").show();
         })
 
         $("#noDelete").click(() => {
-            $(".popup").css('display', "none");
+            $(".popup").hide();
         })
 
         $("#deleteGroup").click((e) => {

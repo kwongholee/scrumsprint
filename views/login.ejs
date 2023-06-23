@@ -11,27 +11,27 @@
 <body>
   <div>
     <div className="loginContainer">
+      <br>
       <div class="container mt-5 loginContainer_1">
-          <h4 style="text-align: center; font-size: 40px;">Login</h4>
-          <form action="/login" method="POST">
-              <div class="form-group">
-                <label style="font-size: 30px;">ID</label>
-                <input type="text" class="form-control" name="id" />
+          <div style="display: flex; justify-content: space-between;">
+            <button id="home-btn" class="login-button" style="order: 1;">Home</button>
+            <h4 style="text-align: center; font-size: 40px; order: 2;">Login</h4>
+            <button id="register-btn" class="login-button" style="order: 3;">회원가입</button>
+          </div>
+          <form class="mt-5" action="/login" method="POST">
+              <div class="mt-5 form-group" style="display: flex; align-items: center;">
+                <label style="font-size: 30px; margin-right: 10px;">ID</label>
+                <input type="text" class="form-control" name="id" style="flex: 1;">
               </div>
-              <div class="form-group">
-                <label style="font-size: 30px;">Password</label>
-                <input type="password" class="form-control" name="pw" />
+              <div class="mt-5 form-group" style="display: flex; align-items: center;">
+                <label style="font-size: 30px; margin-right: 10px;">Password</label>
+                <input type="password" class="form-control" name="pw" style="flex: 1;" />
               </div>
-              <button type="submit" class="btn btn-outline-secondary">Login</button>
+              <div class="mt-5" style="display: flex; justify-content: flex-end;">
+                <button type="submit" class="center-btn btn btn-outline-secondary">Login</button>
+              </div>              
           </form>
       </div>
-    </div>
-  
-    <br>
-    
-    <div class="container">
-      <button id="home-btn" class="login-button">Home</button>
-      <button id="register-btn" class="login-button">회원가입</button>
     </div>
   </div>
 
@@ -55,6 +55,12 @@
   
     .login-button:hover {
       background-color: #ff6666;
+    }
+
+    .center-btn {
+      width: 100px;
+      height: 50px;
+      font-size: 16px;
     }
   </style>
 

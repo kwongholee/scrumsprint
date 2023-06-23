@@ -12,7 +12,7 @@
 <body>
     <div class="container">
         <div class="mt-5">
-            <div style="display: flex; justify-content: space-between;">
+            <div style="display: flex; justify-content: space-between;" class="contain">
                 <button style="order: 1;" class="back-btn" id="back-btn">Go Back</button>
                 <h1 style="order: 2"><i><%= group.groupname %></i> Page</h1>
                 <button style="order: 3;" id="reallyDelete" class="back-btn">그룹 삭제</button>
@@ -21,11 +21,11 @@
             <div class="mt-1">
             </div>
 
-            <div class="popup">
+            <div class="popup1">
                 <h3 style="text-align: center;">정말로 그룹을 삭제하시겠습니까?</h3>
                 <p style="text-align: center;">당연히 그룹 삭제는 "그룹 리더"만 가능합니다</p>
-                <button id="deleteGroup">Yes</button>
-                <button id="noDelete" data-member="<%= group.groupmember %>" data-id="<%= group.groupname %>">No</button>
+                <button id="deleteGroup" class="red-button">Yes</button>
+                <button id="noDelete" class="blue-button" data-member="<%= group.groupmember %>" data-id="<%= group.groupname %>">No</button>
             </div>
 
             <br>
@@ -51,13 +51,56 @@
             <% for(var i = 0; i < group.groupmember.length; i++) { %>
                 <div class="member-box mt-4">
                     <h4>ID: <%= group.groupmember[i] %></h4>
-                    <button class="deleteMember-btn" id="deleteMember" data-id="<%= group.groupmember[i] %>">추방</button>
+                    <button class="deleteMember-btn" id="reallyDelete2" data-id="<%= group.groupmember[i] %>">추방</button>
                 </div>
             <% } %>
+
+            <div class="popup2">
+                <h3 style="text-align: center;">정말로 해당 멤버를 추방하시겠습니까?</h3>
+                <button id="deleteMember-btn" class="red-button">Yes</button>
+                <button id="noDelete2" class="blue-button">No</button>
+            </div>
         </div>
     </div>
 
     <style>
+        .contain {
+            width: 100%;
+            position: relative;
+        }
+
+        .red-button {
+            background-color: #FF4E50;
+            color: #FFFFFF;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+            transition: background-color 0.3s ease;
+            width: 10%;
+            position: absolute;
+            left: 0;
+            margin-left: 20%;
+        }
+        
+        .red-button:hover {
+            background-color: #D14046;
+        }
+        
+        .blue-button {
+            background-color: #1E90FF;
+            color: #FFFFFF;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+            transition: background-color 0.3s ease;
+            width: 10%;
+            position: absolute;
+            right: 0;
+            margin-right: 20%;
+        }
+        
+        .blue-button:hover {
+            background-color: #1565C0;
+        }
+  
         .back-btn {
             display: inline-block;
             padding: 10px 20px;
@@ -122,6 +165,7 @@
             transition: background-color 0.3s;
             margin-right: 10px;
           }
+
           .deleteMember-btn:hover {
             background-color: #ff7db2;
           }
@@ -138,22 +182,55 @@
     </script>
 
     <style>
-        .popup {
+        .popup1 {
             display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            width: 30%;
+            height: 15%;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            text-align: center;
         }
 
-        .popup-box {
-            display: block;
+        .popup2 {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            width: 30%;
+            height: 10%;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            text-align: center;
         }
     </style>
 
     <script>
         $('#reallyDelete').click(() => {
-            $(".popup").show();
+            $(".popup1").show();
         })
 
         $("#noDelete").click(() => {
-            $(".popup").hide();
+            $(".popup1").hide();
+        })
+
+        $("#reallyDelete2").click((e) => {
+            var data = e.target.dataset.id;
+            $("#deleteMember-btn").data('groupmember', data);
+            $('.popup2').show();
+        })
+
+        $("#noDelete2").click(() => {
+            $("deleteMember-btn").removeData('groupmember');
+            $(".popup2").hide();
         })
 
         $("#deleteGroup").click((e) => {
@@ -171,14 +248,15 @@
             })
         })
 
-        $('#deleteMember').click((e) => {
-            var member = e.target.dataset.id;
+        $('#deleteMember-btn').click((e) => {
+            var member = $("#deleteMember-btn").data('groupmember');
             $.ajax({
                 method: 'PUT',
                 url: '/groupmember/put/?groupname=<%= group.groupname %>',
                 data: {member: member}
             }).done(function() {
                 alert('해당 멤버를 추방합니다!');
+                $("#deleteMember-btn").removeData('groupmember');
                 location.reload();
             }).fail(function(a,b,c) {
                 alert('당신은 리더가 아니기 때문에 추방할 수 없습니다!');

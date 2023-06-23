@@ -79,26 +79,25 @@ function Logined(req, res, next) {
   }
 }
 
-const createSalt = async () => { //salt 생성 모듈
+const createSalt = async () => {
   const buffer = await randomBytesPromise(64);
 
   return buffer.toString("base64");
 }
- 
-const createHashedPassword = async (pw) => { //hashedPW 생성 모듈
+
+const createHashedPassword = async (pw) => {
   const salt = await createSalt();
   const key = await pbkdf2Promise(pw, salt, 103701, 64, "sha512");
   const hashedPassword = key.toString("base64");
 
-  return {hashedPassword, salt};
-} 
+  return { hashedPassword, salt };
+}
 
-const verifyPassword = async (pw, userSalt, userPassWord) => { //hashedPW와 salt 검사 판별 모듈
-  const key = await pbkdf2Promise(pw, userSalt, 99999, 64, "sha512");
+const verifyPassword = async (pw, userSalt, userPassWord) => {
+  const key = await pbkdf2Promise(pw, userSalt, 103701, 64, "sha512");
   const hashedPassword = key.toString("base64");
-  
-  if(hashedPassword === userPassWord) return true;
-  return false;
+
+  return hashedPassword === userPassWord;
 }
 
 passport.use(new Localstoragey({ // db에 저장된 로그인 정보와 확인하는 모듈
@@ -109,14 +108,12 @@ passport.use(new Localstoragey({ // db에 저장된 로그인 정보와 확인�
 }, async (inputId, inputPw, done) => {
   try {
     db.collection('user').findOne({ id: inputId }, function (err, result) {
-      if (err) return done(err)
-      if (!result) return done(null, false, { message: '존재하지않는 아이디입니다!' })
-      const verified = verifyPassword(inputPw, result.salt, result.pw); 
-      if (!verified) { //verified
-        return done(null, false, { message: '비번 틀렸어요' })
-      } else {
-        return done(null, result)
-      }
+      if (err) return done(err);
+      if (!result) return done(null, false, { message: '존재하지 않는 아이디입니다!' });
+      verifyPassword(inputPw, result.salt, result.pw).then(function (verified) {
+        if (!verified) return done(null, false, {message: '비번 틀림'});
+        else return done(null, result);
+      });
     })  
   } catch(err) {
     console.log(err);
@@ -215,17 +212,17 @@ app.get('/main/group', Logined, (req, res) => {
   })
 })
 
-app.get('/main/group/make', (req, res) => {
+app.get('/main/group/make', Logined, (req, res) => {
   res.render('groupmake.ejs', {id: req.user.id});
 })
 
-app.get('/main/group/private', (req, res) => {
+app.get('/main/group/private', Logined, (req, res) => {
   db.collection('group').findOne({groupname: req.query.groupname}, (err, result) => {
     return res.render('groupdetail.ejs', {group: result, id: req.user.id});
   })
 })
 
-app.post('/main/group/code', (req, res) => {
+app.post('/main/group/code', Logined, (req, res) => {
   var resultGroup;
   db.collection('group').find().toArray((err, result) => {
     for(var i = 0; i < result.length; i++) {
@@ -291,12 +288,11 @@ app.delete('/main/delete', Logined, function(req, res) {
   })  
 })
 
-// 그룹명 정규식(아직 정규식이 완성이 안 됨)
-// function isGroupName(v) {
-//   let regex = /""/;
+function isGroupName(v) {
+  let regex = /^.{1,10}$/;
 
-//   return regex.test(v);
-// }
+  return regex.test(v);
+}
 
 function isGroupinfo(v) {
   let regex = /^[ㄱ-ㅎㅏ-ㅣ가-힣]{1,20}$/;
@@ -304,13 +300,13 @@ function isGroupinfo(v) {
   return regex.test(v);
 }
 
-app.post('/groupmake', (req, res) => {
+app.post('/groupmake', Logined, (req, res) => {
   if(!isGroupinfo(req.body.groupinfo)) {
-    return res.send("<script>alert('그룹 정보는 반드시 한글로만 100자 이내로 입력해주세요!'); window.location.replace('/main/group/make'); </script>");
+    return res.status(400).send({message: "do not break the rule"});
   }
-  // else if(!isGroupName(req.body.groupname)) {
-  //   return res.send("<script>alert('그룹명은 반드시 한글,영어,숫자를 이용하여 10자 이내로 입력해주세요!'); window.location.replace('/main/group/make'); </script>");
-  // }
+  else if(!isGroupName(req.body.groupname)) {
+    return res.status(400).send({message: "do not break the rule"});
+  }
   else {
     db.collection('group').find().toArray((err, result) => {
       for(var i = 0; i < result.length; i++) {
@@ -327,7 +323,7 @@ app.post('/groupmake', (req, res) => {
   }
 })
 
-app.put('/groupmember/put', (req, res) => {
+app.put('/groupmember/put', Logined, (req, res) => {
   db.collection('group').findOne({groupname: req.query.groupname}, (err, result) => {
     if(result.groupleader != req.user.id) {
       return res.status(400).send({message: 'you are not a groupleader'});
@@ -344,7 +340,7 @@ app.put('/groupmember/put', (req, res) => {
   })
 })
 
-app.delete('/group/delete', (req, res) => {
+app.delete('/group/delete', Logined, (req, res) => {
   db.collection('group').findOne({groupname: req.query.groupname}, (err, result) => {
     if(result.groupleader != req.user.id) {
       return res.status(400).send({message: 'you are not a groupleader'});
@@ -352,20 +348,22 @@ app.delete('/group/delete', (req, res) => {
     else {
       var list = result.groupmember;
       db.collection('group').deleteOne({groupname: req.query.groupname}, (err,result) => {
-        db.collection('user').updateOne({id: req.user.id}, {$pull: {groupleader: req.query.groupname}}, (err, result) => {
-          for(var i = 0; i < list.length; i++) {
-            db.collection('user').updateOne({id: list[i]}, {$pull: {group: req.query.groupname}}, (err, result) => {
-              if(err) console.log(err);
-              return res.status(200).send({message: "success to delete group"});
-            })
-          }
+        db.collection('post').deleteMany({writer: req.query.groupname}, (err, result) => {
+          db.collection('user').updateOne({id: req.user.id}, {$pull: {groupleader: req.query.groupname}}, (err, result) => {
+            for(var i = 0; i < list.length; i++) {
+              db.collection('user').updateOne({id: list[i]}, {$pull: {group: req.query.groupname}}, (err, result) => {
+                if(err) console.log(err);
+              })
+            }
+            return res.status(200).send({message: "success to delete group"});
+          })
         })
       })
     }
   })
 })
 
-app.get('/main/group/sprint', (req, res) => {
+app.get('/main/group/sprint', Logined, (req, res) => {
   db.collection('post').find().toArray((err, result) => {
     var postresultFalse = [];
     var postresultTrue = [];
@@ -381,7 +379,7 @@ app.get('/main/group/sprint', (req, res) => {
   })
 })
 
-app.post('/group/write', (req,res) => {
+app.post('/group/write', Logined, (req,res) => {
   db.collection('counter').findOne({name: "postNum"}, (err,result) => {
     var total = result.totalPost;
     db.collection('post').insertOne({_id: total+1, writer: req.query.groupname, content: req.body.content, complete: 'false'}, (err, result) => {
@@ -414,6 +412,4 @@ app.delete('/main/group/delete', Logined, function(req, res) {
 })
 
 // 아이디 중복확인 버튼을 만드는 거 어떰? (잠깐 대기 맨 마지막에 구현해도 될 듯?)
-// group 이름 정규식 만들기
 // 날짜도 기록해서 날짜별로 todo 뭐 있었는지 볼 수 있게 하기(이건 어떡할까 구현할까 말까)
-// 나머지는 디자인 좀 몰두하자 ㅎㅎ

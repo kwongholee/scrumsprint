@@ -67,7 +67,7 @@ app.post('/login',passport.authenticate('local', { //로그인 value가 타당�
     }
     var percent = 0;
     if (postresultFalse.length != 0 || postresultTrue.length != 0) percent = postresultTrue.length / (postresultTrue.length+postresultFalse.length) * 100;
-    res.render('main.ejs', {id: req.user.id, postsfalse: postresultFalse, poststrue: postresultTrue, percent: percent});
+    return res.redirect('/main/?time=today');
   })
 })
 
@@ -181,7 +181,7 @@ app.post('/register', function(req, res) {
       }
       else if(!doublecheck) {
         db.collection('user').insertOne({name: req.body.name, id : req.body.id, phonenumber: req.body.phonenumber, pw: createdPW, salt: createdSalt, group: [], groupleader: []}, function(err, result) {
-          return res.redirect('/main/?time=today');
+          return res.send("<script>alert('회원가입을 완료하였습니다. 로그인 창에서 로그인 해주세요!');  window.location.replace('/login'); </script>");
         })
       }
     })

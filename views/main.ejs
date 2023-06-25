@@ -20,7 +20,8 @@
 
       <div style="display:flex; justify-content: space-between">
         <button class="todayBtn" id="today">오늘 할 일</button>
-        <button class="projectBtn" id="project">이번 프로젝트에서 할 일</button>
+        <h3><%= query %></h3>
+        <button class="projectBtn" id="project">프로젝트에서 할 일</button>
       </div>
       <br>
 
@@ -177,7 +178,7 @@
     <script>
       var deadline = window.location.search;
       var time = "오늘 할 일";
-      if(deadline.substr(6) == "project") time = "이번 프로젝트에서 할 일";
+      if(deadline.substr(6) == "project") time = "프로젝트에서 할 일";
       
       $('#submitTodo').click(() => {
         var content = $('#content').val();

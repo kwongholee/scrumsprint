@@ -200,9 +200,11 @@ app.get('/main', Logined, (req,res) => { // 로그인하면 이 페이지로 넘
         else postresultFalse.push(result[i])
       }
     }
+    var queryTime = '오늘 할 일';
+    if(req.query.time == "project") queryTime = '프로젝트에서 할 일'
     var percent = 0;
     if (postresultFalse.length != 0 || postresultTrue.length != 0) percent = postresultTrue.length / (postresultTrue.length+postresultFalse.length) * 100;
-    res.render('main.ejs', {id: req.user.id, postsfalse: postresultFalse, poststrue: postresultTrue, percent: percent});
+    res.render('main.ejs', {id: req.user.id, postsfalse: postresultFalse, poststrue: postresultTrue, percent: percent, query: queryTime});
   })
 })
 

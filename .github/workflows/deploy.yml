@@ -1,0 +1,40 @@
+name: Deploy to cloudtype
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Connect deploy key
+        uses: cloudtype-github-actions/connect@v1
+        with:
+          token: ${{ secrets.CLOUDTYPE_TOKEN }}
+          ghtoken: ${{ secrets.GHP_TOKEN }}
+      - name: Deploy
+        uses: cloudtype-github-actions/deploy@v1
+        with:
+          token: ${{ secrets.CLOUDTYPE_TOKEN }}
+          project: ghlee9883/scrumsprint
+          stage: main
+          yaml: >
+            name: scrumsprint
+
+            app: node@18
+
+            options:
+              env:
+                - name: DB_URL
+                  value: mongodb+srv://royalastral9883:sandbox77@database1.winwah5.mongodb.net/?retryWrites=true&w=majority
+                - name: PORT
+                  value: "8080"
+              ports: "8080"
+              install: npm ci --production
+              start: node server
+            context:
+              git:
+                url: git@github.com:${{ github.repository }}.git
+                ref: ${{ github.ref }}
